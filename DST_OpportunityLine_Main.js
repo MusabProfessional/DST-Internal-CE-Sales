@@ -193,7 +193,7 @@ var OpportunityLine = OpportunityLine || { namespace: true };
 
         marginAmount: function(executionContext){
             var formContext = executionContext.getFormContext();
-            var PricePerUnit = formContext.getAttribute("priceperunit").getValue();
+            var PricePerUnit = formContext.getAttribute("dst_priceperunit").getValue();
             var costPrice = formContext.getAttribute("dst_costprice").getValue();
             var marginAmount = PricePerUnit - costPrice;
             formContext.getAttribute("dst_marginamount").setValue(marginAmount);
@@ -206,14 +206,18 @@ var OpportunityLine = OpportunityLine || { namespace: true };
         
             var costPrice = formContext.getAttribute("dst_costprice").getValue();
             var marginPercentage = formContext.getAttribute("dst_marginpercentage").getValue();
+            var duration = formContext.getAttribute("dst_duration").getValue();
         
             if (costPrice !== null && marginPercentage !== null) {
             
                 var PricePerUnit = costPrice / (1 - (marginPercentage / 100));
-                formContext.getAttribute("priceperunit").setValue(PricePerUnit);
+                var BaseAmount = PricePerUnit * duration;
+                formContext.getAttribute("priceperunit").setValue(BaseAmount);
+                formContext.getAttribute("dst_priceperunit").setValue(PricePerUnit);
             } else {
             
                 formContext.getAttribute("priceperunit").setValue(null);
+                formContext.getAttribute("dst_priceperunit").setValue(null);
             }
         },
         fetchProductPrice: function(executionContext){
@@ -304,18 +308,5 @@ var OpportunityLine = OpportunityLine || { namespace: true };
                 formContext.getAttribute("priceperunit").setValue(null);
                 formContext.getAttribute("dst_costprice").setValue(null);
             }
-        },
-
-        calculateTotalAmount: function(executionContext){
-            debugger;
-            var formContext = executionContext.getFormContext();
-            var PricePerUnit = formContext.getAttribute("priceperunit").getValue();
-            var duration = formContext.getAttribute("dst_duration").getValue();
-            if(PricePerUnit !== null && duration !== null)
-                {
-                   var totalAmount = PricePerUnit * duration;
-                   alert(totalAmount);
-                   formContext.getAttribute("baseamount").setValue(totalAmount);
-                }
         }
     };
