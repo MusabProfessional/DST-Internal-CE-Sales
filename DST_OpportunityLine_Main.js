@@ -64,6 +64,7 @@ var OpportunityLine = OpportunityLine || { namespace: true };
         
                         formContext.getAttribute("dst_costprice").setValue(dst_costprice);
                         formContext.getAttribute("dst_listprice").setValue(dst_listprice);
+                        formContext.getAttribute("dst_listprice2").setValue(dst_listprice);
                         formContext.getAttribute("uomid").setValue(lookupValue);
                     },
                     function(error) {
@@ -195,6 +196,7 @@ var OpportunityLine = OpportunityLine || { namespace: true };
             var formContext = executionContext.getFormContext();
             var PricePerUnit = formContext.getAttribute("dst_priceperunit").getValue();
             var costPrice = formContext.getAttribute("dst_costprice").getValue();
+
             var marginAmount = PricePerUnit - costPrice;
             formContext.getAttribute("dst_marginamount").setValue(marginAmount);
             var MarginPercentage = (marginAmount/PricePerUnit) * 100;
@@ -205,20 +207,30 @@ var OpportunityLine = OpportunityLine || { namespace: true };
             var formContext = executionContext.getFormContext();
         
             var costPrice = formContext.getAttribute("dst_costprice").getValue();
+            var listPrice = formContext.getAttribute("dst_listprice").getValue();
+            var ActualmarginAmount = listPrice - costPrice;
+            var ActualMarginPercentage = (ActualmarginAmount/listPrice) * 100;
+
             var marginPercentage = formContext.getAttribute("dst_marginpercentage").getValue();
             var duration = formContext.getAttribute("dst_duration").getValue();
-        
+
+        if(marginPercentage <= ActualMarginPercentage){
             if (costPrice !== null && marginPercentage !== null) {
             
                 var PricePerUnit = costPrice / (1 - (marginPercentage / 100));
                 var BaseAmount = PricePerUnit * duration;
                 formContext.getAttribute("priceperunit").setValue(BaseAmount);
                 formContext.getAttribute("dst_priceperunit").setValue(PricePerUnit);
+                formContext.ui.clearFormNotification("valueRestriction");
             } else {
             
                 formContext.getAttribute("priceperunit").setValue(null);
                 formContext.getAttribute("dst_priceperunit").setValue(null);
             }
+        }
+        else{
+            formContext.ui.setFormNotification("Value cannot be more than " + ActualMarginPercentage + "%", "ERROR", "valueRestriction");
+        }
         },
         fetchProductPrice: function(executionContext){
             debugger;
@@ -286,6 +298,7 @@ var OpportunityLine = OpportunityLine || { namespace: true };
                                 case termDurationLabel:
                                     formContext.getAttribute("dst_priceperunit").setValue(amount);
                                     formContext.getAttribute("priceperunit").setValue(amount);
+                                    formContext.getAttribute("dst_listprice").setValue(amount);
                                     formContext.getAttribute("uomid").setValue(unitset);
                                     formContext.getAttribute("dst_costprice").setValue(costPrice);
                                     priceFound = true;
@@ -296,6 +309,7 @@ var OpportunityLine = OpportunityLine || { namespace: true };
                             formContext.getAttribute("dst_priceperunit").setValue(null);
                             formContext.getAttribute("priceperunit").setValue(null);
                             formContext.getAttribute("dst_costprice").setValue(null);
+                            formContext.getAttribute("dst_listprice").setValue(null);
                             formContext.getAttribute("uomid").setValue(null);
                         }
                     },
@@ -309,4 +323,17 @@ var OpportunityLine = OpportunityLine || { namespace: true };
                 formContext.getAttribute("dst_costprice").setValue(null);
             }
         }
+
+        // calculateTotalAmount: function(executionContext){
+        //     debugger;
+        //     var formContext = executionContext.getFormContext();
+        //     var PricePerUnit = formContext.getAttribute("priceperunit").getValue();
+        //     var duration = formContext.getAttribute("dst_duration").getValue();
+        //     if(PricePerUnit !== null && duration !== null)
+        //         {
+        //            var totalAmount = PricePerUnit * duration;
+        //            alert(totalAmount);
+        //            formContext.getAttribute("baseamount").setValue(totalAmount);
+        //         }
+        // }
     };
