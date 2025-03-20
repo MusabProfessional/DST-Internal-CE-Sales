@@ -229,7 +229,7 @@ var OpportunityLine = OpportunityLine || { namespace: true };
             }
         }
         else{
-            formContext.ui.setFormNotification("Value cannot be more than " + ActualMarginPercentage + "%", "ERROR", "valueRestriction");
+            formContext.ui.setFormNotification("Margin Percentage cannot be greater than " + ActualMarginPercentage + "%", "ERROR", "valueRestriction");
         }
         },
         fetchProductPrice: function(executionContext){
